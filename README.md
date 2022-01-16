@@ -8,7 +8,7 @@ This is a simple tool that produces a message with a SHA256 hash that signs the 
 
 ## Example
 
-The Wordle This shows how to sign text from the command line. 
+This shows how to sign text from the command line. 
 ```sh
 Dave$ target/debug/wordle-hash -k "faker" text 'Wordle 210 3/6*
 > 
