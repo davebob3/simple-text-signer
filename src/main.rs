@@ -5,57 +5,11 @@ use openssl::memcmp;
 use openssl::pkey::PKey;
 use openssl::sign::Signer;
 
-#[derive(clap::Parser, Debug)]
-#[clap(author, version, about, long_about = None)]
-struct Args {
-    #[clap(subcommand)]
-    command: Command,
+mod args;
+#[cfg(test)]
+mod test;
 
-    /// signature
-    #[clap(short, long)]
-    key: String,
-}
-
-/// Subcommand: sign with command line text, sign the contents of the file,
-/// or verify text on the command line
-#[derive(clap::Subcommand, Debug)]
-#[clap(author, version, about, long_about = None)]
-enum Command {
-    /// Sign the command line text
-    Text { text: String },
-    /// Sign the contents of a file
-    File { file: String },
-    /// Verify the output of the signing commands.
-    Verify { text: String },
-}
-
-impl Command {
-    fn is_sign(&self) -> bool {
-        match self {
-            Command::Text { .. } | Command::File { .. } => true,
-            Command::Verify { .. } => false,
-        }
-    }
-    fn is_verify(&self) -> bool {
-        !self.is_sign()
-    }
-
-    fn get_string(&self) -> Result<String, Box<dyn std::error::Error + 'static>> {
-        match self {
-            Command::Text { text } | Command::Verify { text } => Ok(text.trim_end().to_string()),
-            Command::File { file } => std::fs::read_to_string(file).map_err(Box::from),
-        }
-    }
-
-    fn get_data(&self) -> Result<Vec<u8>, Box<dyn std::error::Error + 'static>> {
-        match self {
-            Command::Text { text } | Command::Verify { text } => {
-                Ok(text.trim_end().to_string().into_bytes())
-            }
-            Command::File { file } => std::fs::read(file).map_err(Box::from),
-        }
-    }
-}
+use args::Args;
 
 fn sign_with_key(
     key: &[u8],
@@ -63,7 +17,7 @@ fn sign_with_key(
 ) -> Result<Vec<u8>, Box<dyn std::error::Error + 'static>> {
     let pkey = PKey::hmac(key)?;
     let mut signer = Signer::new(MessageDigest::sha256(), &pkey)?;
-    signer.update(&input)?;
+    signer.update(input)?;
     signer.sign_to_vec().map_err(Box::from)
 }
 
