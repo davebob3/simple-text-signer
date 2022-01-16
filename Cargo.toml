@@ -1,0 +1,10 @@
+[package]
+name = "simple-text-signer"
+version = "0.1.0"
+edition = "2021"
+description = "Designed for Wordle output. Sign the output with the answer and get new text with a signature at the end."
+
+[dependencies]
+base64 = "0.13.0"
+clap = { version = "3.0.7", features = ["derive", "unicode"] }
+openssl = "0.10.38"
