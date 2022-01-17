@@ -1,0 +1,56 @@
+name: binaries
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # windows:
+  #   runs-on: windows-latest
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - name: Build release
+  #     run: cargo build --release
+  #   - uses: actions/upload-artifact@v2
+  #     with:
+  #       name: simple-text-signer-windows
+  #       path: target/release/simple-text-signer.exe
+
+  macos:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build release
+      run: cargo build --release
+    - uses: actions/upload-artifact@v2
+      with:
+        name: simple-text-signer-macos
+        path: target/release/simple-text-signer
+
+  ubuntu18:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build release
+      run: cargo build --release
+    - uses: actions/upload-artifact@v2
+      with:
+        name: simple-text-signer-ubuntu18
+        path: target/release/simple-text-signer
+
+  ubuntu20:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build release
+      run: cargo build --release
+    - uses: actions/upload-artifact@v2
+      with:
+        name: simple-text-signer-ubuntu20
+        path: target/release/simple-text-signer
