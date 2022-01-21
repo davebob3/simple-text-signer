@@ -1,9 +1,6 @@
 use clap::Parser;
 
-use openssl::hash::MessageDigest;
-use openssl::memcmp;
-use openssl::pkey::PKey;
-use openssl::sign::Signer;
+use ring::hmac;
 
 mod args;
 #[cfg(test)]
@@ -15,10 +12,8 @@ fn sign_with_key(
     key: &[u8],
     input: &[u8],
 ) -> Result<Vec<u8>, Box<dyn std::error::Error + 'static>> {
-    let pkey = PKey::hmac(key)?;
-    let mut signer = Signer::new(MessageDigest::sha256(), &pkey)?;
-    signer.update(input)?;
-    signer.sign_to_vec().map_err(Box::from)
+    let pkey = hmac::Key::new(hmac::HMAC_SHA256, key);
+    Ok(hmac::sign(&pkey, input).as_ref().to_owned())
 }
 
 fn sign(args: Args) -> Result<String, Box<dyn std::error::Error + 'static>> {
@@ -44,8 +39,11 @@ fn verify(args: Args) -> Result<bool, Box<dyn std::error::Error + 'static>> {
             .ok_or_else(|| String::from(err_msg))?
             .trim_end(),
     )?;
-    let test = sign_with_key(key, input_text.as_bytes())?;
-    Ok(memcmp::eq(&test, &hash))
+    let pkey = hmac::Key::new(hmac::HMAC_SHA256, key);
+    match hmac::verify(&pkey, input_text.as_bytes(), &hash) {
+        Ok(_) => Ok(true),
+        Err(_) => Ok(false),
+    }
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {

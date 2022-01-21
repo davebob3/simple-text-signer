@@ -7,7 +7,7 @@ description = "Designed for Wordle output. Sign the output with the answer and g
 [dependencies]
 base64 = "0.13.0"
 clap = { version = "3.0.7", features = ["derive", "unicode"] }
-openssl = "0.10.38"
+ring = "0.16.20"
 
 [dev-dependencies]
 tempfile = "3.3.0"            # A library for managing temporary files and directories.
