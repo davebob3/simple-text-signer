@@ -20,13 +20,15 @@ pub enum Command {
     File { file: String },
     /// Verify the output of the signing commands.
     Verify { text: String },
+    /// Verify the contents of a file.
+    VerifyFile { file: String },
 }
 
 impl Command {
     pub fn is_sign(&self) -> bool {
         match self {
             Command::Text { .. } | Command::File { .. } => true,
-            Command::Verify { .. } => false,
+            Command::Verify { .. } | Command::VerifyFile { .. } => false,
         }
     }
     pub fn is_verify(&self) -> bool {
@@ -36,7 +38,9 @@ impl Command {
     pub fn get_string(&self) -> Result<String, Box<dyn std::error::Error + 'static>> {
         match self {
             Command::Text { text } | Command::Verify { text } => Ok(text.trim_end().to_string()),
-            Command::File { file } => std::fs::read_to_string(file).map_err(Box::from),
+            Command::File { file } | Command::VerifyFile { file } => {
+                std::fs::read_to_string(file).map_err(Box::from)
+            }
         }
     }
 
@@ -45,7 +49,9 @@ impl Command {
             Command::Text { text } | Command::Verify { text } => {
                 Ok(text.trim_end().to_string().into_bytes())
             }
-            Command::File { file } => std::fs::read(file).map_err(Box::from),
+            Command::File { file } | Command::VerifyFile { file } => {
+                std::fs::read(file).map_err(Box::from)
+            }
         }
     }
 }
