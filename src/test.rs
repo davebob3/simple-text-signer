@@ -65,6 +65,30 @@ fn sign_with_file_matches_sign_with_text() {
 }
 
 #[test]
+fn we_can_verify_a_file() {
+    let mut tmpfile = NamedTempFile::new().unwrap();
+
+    let sign_args = Args {
+        command: Command::Text {
+            text: TEXT1.to_string(),
+        },
+        key: KEY1.to_string(),
+    };
+    let signed_text = sign(sign_args).unwrap();
+    write!(tmpfile.as_file_mut(), "{}", signed_text).unwrap();
+
+    let verify_args = Args {
+        command: Command::VerifyFile {
+            file: tmpfile.path().to_string_lossy().into_owned(),
+        },
+        key: KEY1.to_string(),
+    };
+
+    let verify_result = verify(verify_args).unwrap();
+    assert!(verify_result);
+}
+
+#[test]
 fn we_can_verify_what_we_sign() {
     let sign_args = Args {
         command: Command::Text {
